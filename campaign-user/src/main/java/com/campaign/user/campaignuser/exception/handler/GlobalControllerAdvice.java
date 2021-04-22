@@ -4,12 +4,15 @@ import com.campaign.user.campaignuser.exception.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -35,6 +38,8 @@ public class GlobalControllerAdvice {
                 .map(err -> (err.getObjectName()).concat(", ").concat(err.getDefaultMessage()))
                 .collect(Collectors.toList()));
         ErrorMessage errorMessage = new ErrorMessage(errors);
+        log.error("Validation failures occurred");
+        errors.forEach(log::error);
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
@@ -55,5 +60,27 @@ public class GlobalControllerAdvice {
         ErrorMessage errorMessage;
         errorMessage = new ErrorMessage(Collections.singletonList(ex.getMessage()));
         return new ResponseEntity<>(errorMessage,  HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorMessage> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        ErrorMessage errorMessage;
+        errorMessage = new ErrorMessage(Collections.singletonList(ex.getMessage()));
+        return new ResponseEntity<>(errorMessage,  HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorMessage> handleRestClientException(RestClientException ex) {
+        ErrorMessage errorMessage;
+        errorMessage = new ErrorMessage(Collections.singletonList(ex.getMessage()));
+        return new ResponseEntity<>(errorMessage,  HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleHttpClientErrorException(HttpClientErrorException ex) {
+        return new ResponseEntity<>( ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

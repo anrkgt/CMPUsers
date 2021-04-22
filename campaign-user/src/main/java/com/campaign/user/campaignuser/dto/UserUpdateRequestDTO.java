@@ -26,10 +26,4 @@ public class UserUpdateRequestDTO {
 
     private String address;
 
-    @EnumConstraint(
-            acceptedValues = "Active | Terminated | Suspended",
-            enumClass = StateType.class,
-            message = ErrorConstants.VALID_STATE
-    )
-    private String state;
 }

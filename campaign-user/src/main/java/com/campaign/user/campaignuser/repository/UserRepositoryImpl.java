@@ -17,8 +17,7 @@ public class UserRepositoryImpl  {
     }
 
     public User save(User entity) {
-        templateMongo.getTemplateMongo().save(entity);
-        return entity;
+       return templateMongo.getTemplateMongo().save(entity);
     }
 
     public User findById(String id) {

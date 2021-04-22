@@ -27,5 +27,4 @@ public class EnumValidatorImpl implements ConstraintValidator<EnumConstraint, St
                 .getEnumConstants()).map(Object::toString).collect(toList());
     }
 
-
 }

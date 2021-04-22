@@ -14,7 +14,6 @@ public enum StateType {
         this.type = type;
     }
 
-
     @JsonValue
     public String getType() {
         return type;
